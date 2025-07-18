@@ -19,25 +19,19 @@ function Get-SDCAllProductInfo {
     $url = "https://endoflife.date/api/v1/products/full"
     try {
         $products = Invoke-RestMethod -Uri $url -ErrorAction Stop
+
+        if ($null -eq $products) {
+            Write-Error "No productS found."
+            return
+        }
+
+        Write-Verbose "All Product information retrieved successfully."
+        # Convert the product information to a PowerShell object
+        $productInfo = [psobject]$products.result
+        $productInfo
     }
     catch {
         Write-Error "Failed to retrieve all product information. Error: $_"
         return
     }
-    if ($null -eq $products) {
-        Write-Error "No productS found."
-        return
-    }
-
-    $productReleaseInfo = [System.Collections.Generic.List[PSCustomObject]]::new()
-
-    foreach($result in $products.result) {
-        foreach ($prodRelease in $result.releases) {
-            $releaseAsObj = Format-ProductResultAsObject -ProductName $result.name -ProductResult $prodRelease
-            $productReleaseInfo.Add($releaseAsObj)
-        }
-    }
-
-    Write-Verbose "All Product information retrieved successfully."
-    return $productReleaseInfo
 }

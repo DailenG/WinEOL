@@ -40,31 +40,20 @@ function Get-SDCProductInfo {
 
     try {
         $product = @(Invoke-RestMethod -Uri $url -ErrorAction Stop)
+
+        if ($null -eq $product) {
+            Write-Error "No product found with the name '$ProductName'."
+            return
+        }
+
+        Write-Verbose "Product information for '$ProductName' retrieved successfully."
+
+        # Convert the product information to a PowerShell object
+        $productInfo = [psobject]$product.result
+        $productInfo
     }
     catch {
         Write-Error "Failed to retrieve product information for '$ProductName'. Error: $_"
         return
     }
-    if ($null -eq $product) {
-        Write-Error "No product found with the name '$ProductName'."
-        return
-    }
-
-
-    $productReleaseInfo = [System.Collections.Generic.List[PSCustomObject]]::new()
-
-    if($null -eq $product.result.releases){
-        $releaseAsObj = Format-ProductResultAsObject -ProductName $ProductName -ProductResult $product.result
-        $productReleaseInfo.Add($releaseAsObj)
-    } else {
-        # Process each release in the product response
-        foreach ($prodRelease in $product.result.releases) {
-            $releaseAsObj = Format-ProductResultAsObject -ProductName $ProductName -ProductResult $prodRelease
-            $productReleaseInfo.Add($releaseAsObj)
-        }
-    }
-
-    Write-Verbose "Product information for '$ProductName' retrieved successfully."
-    $productReleaseInfo
-
 }

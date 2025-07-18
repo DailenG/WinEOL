@@ -46,17 +46,19 @@ function Get-SDCAllProductsByCategory {
 
     try {
         $products = Invoke-RestMethod -Uri $url -ErrorAction Stop
+
+        if ($null -eq $products) {
+            Write-Error "No products found in the name '$Category'."
+            return
+        }
+
+        Write-Verbose "Product information for category '$Category' retrieved successfully."
+        # Convert the product information to a PowerShell object
+        $productInfo = [psobject]$products.result
+        $productInfo
     }
     catch {
         Write-Error "Failed to retrieve product information for category '$Category'. Error: $_"
         return
     }
-
-    if ($null -eq $products) {
-        Write-Error "No products found in the name '$Category'."
-        return
-    }
-
-    Write-Verbose "Product information for category '$Category' retrieved successfully."
-    return $products.result
 }
