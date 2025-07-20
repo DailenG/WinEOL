@@ -1,0 +1,115 @@
+<!--
+Format type data generated 07/20/2025 12:34:26 by WINDOWS-9HL78O0\siale
+
+This file was created using the New-PSFormatXML command that is part
+of the PSScriptTools module.
+
+https://github.com/jdhitsolutions/PSScriptTools
+-->
+<Configuration>
+  <ViewDefinitions>
+    <View>
+      <!--Created 07/20/2025 12:34:26 by WINDOWS-9HL78O0\siale-->
+      <Name>default</Name>
+      <ViewSelectedBy>
+        <TypeName>SupportDeathClock.EOLProductInfoWithReleases</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <!--Delete the AutoSize node if you want to use the defined widths.-->
+        <AutoSize />
+        <TableHeaders>
+          <TableColumnHeader>
+            <Label>name</Label>
+            <Width>13</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>aliases</Label>
+            <Width>10</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>label</Label>
+            <Width>13</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>category</Label>
+            <Width>13</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>tags</Label>
+            <Width>18</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>versionCommand</Label>
+            <Width>17</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>identifiers</Label>
+            <Width>18</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>labels</Label>
+            <Width>9</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>links</Label>
+            <Width>8</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>releases</Label>
+            <Width>18</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <!--
+            By default the entries use property names, but you can replace them with script blocks.
+            <ScriptBlock>$_.foo /1mb -as [int]</ScriptBlock>
+-->
+              <TableColumnItem>
+                <PropertyName>name</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>aliases</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>label</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>category</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>tags</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>versionCommand</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>identifiers</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>labels</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>links</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>releases</PropertyName>
+              </TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+  </ViewDefinitions>
+</Configuration>
