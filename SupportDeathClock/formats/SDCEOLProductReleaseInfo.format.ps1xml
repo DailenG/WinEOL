@@ -16,29 +16,20 @@ https://github.com/jdhitsolutions/PSScriptTools
       </ViewSelectedBy>
       <GroupBy>
         <PropertyName>ProductLabel</PropertyName>
+        <Label>Product</Label>
       </GroupBy>
       <TableControl>
         <!--Delete the AutoSize node if you want to use the defined widths.-->
         <AutoSize />
         <TableHeaders>
           <TableColumnHeader>
-            <Label>Name</Label>
+            <Label>Version</Label>
             <Width>7</Width>
             <Alignment>left</Alignment>
           </TableColumnHeader>
           <TableColumnHeader>
             <Label>ReleaseDate</Label>
             <Width>14</Width>
-            <Alignment>left</Alignment>
-          </TableColumnHeader>
-          <TableColumnHeader>
-            <Label>eoasFrom</Label>
-            <Width>13</Width>
-            <Alignment>left</Alignment>
-          </TableColumnHeader>
-          <TableColumnHeader>
-            <Label>isEol</Label>
-            <Width>8</Width>
             <Alignment>left</Alignment>
           </TableColumnHeader>
           <TableColumnHeader>
@@ -52,12 +43,12 @@ https://github.com/jdhitsolutions/PSScriptTools
             <Alignment>left</Alignment>
           </TableColumnHeader>
           <TableColumnHeader>
-            <Label>latestName</Label>
+            <Label>latestVersion</Label>
             <Width>13</Width>
             <Alignment>left</Alignment>
           </TableColumnHeader>
           <TableColumnHeader>
-            <Label>latestDate</Label>
+            <Label>latestReleaseDate</Label>
             <Width>13</Width>
             <Alignment>left</Alignment>
           </TableColumnHeader>
@@ -88,16 +79,27 @@ https://github.com/jdhitsolutions/PSScriptTools
                 <PropertyName>ReleaseDate</PropertyName>
               </TableColumnItem>
               <TableColumnItem>
-                <PropertyName>eoasFrom</PropertyName>
+                <ScriptBlock>
+                $daysUntilEol = ([DateTime]$_.eolFrom - (Get-Date)).days
+                $Style = $PSStyle.Foreground.Green
+                if($daysUntilEol -le 60){
+                  $Style = $PSStyle.Foreground.Red
+                }
+                elseif($daysUntilEol -le 180){
+                  $Style = $PSStyle.Foreground.Yellow
+                }
+                "$Style$($_.eolFrom)$($PSStyle.Reset)"
+                </ScriptBlock>
               </TableColumnItem>
               <TableColumnItem>
-                <PropertyName>isEol</PropertyName>
-              </TableColumnItem>
-              <TableColumnItem>
-                <PropertyName>eolFrom</PropertyName>
-              </TableColumnItem>
-              <TableColumnItem>
-                <PropertyName>isMaintained</PropertyName>
+                <ScriptBlock>
+                if($_.isMaintained -eq $true){
+                  $Style = $PSStyle.Foreground.Green
+                } else {
+                  $Style = $PSStyle.Foreground.Red
+                }
+                "$Style$($_.isMaintained)$($PSStyle.Reset)"
+                </ScriptBlock>
               </TableColumnItem>
               <TableColumnItem>
                 <PropertyName>latestName</PropertyName>
