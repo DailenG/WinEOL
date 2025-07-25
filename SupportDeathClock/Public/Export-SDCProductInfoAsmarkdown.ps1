@@ -22,10 +22,26 @@ function Export-SDCProductInfoAsMarkdown {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-        [PSObject]$ProductInfo
+         [ValidateScript({
+            'SupportDeathClock.EOLProductInfoWithReleases' -in $_.PSTypeNames
+        })]
+        [PSObject]$ProductInfo,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateScript({
+            if (-not (Test-Path -Path $_ )) {
+                throw "The directory path '$_' does not exist. Please create the directory first."
+            } else {
+                $True
+            }
+        })]
+        [string]$OutputPath
     )
 
     process {
+        # Build Path for Markdown output
+        $MarkdownOutputPath = Join-Path -Path $OutputPath -ChildPath "$($ProductInfo.name.replace(" ","_")).md"
+
         # Create markdown output
         $markdown = [System.Text.StringBuilder]::new()
 
@@ -107,7 +123,7 @@ function Export-SDCProductInfoAsMarkdown {
             }
         }
 
-        # Output the markdown
-        return $markdown.ToString()
+        # Output the markdown to file
+        $markdown.ToString() | Set-Content -Path $MarkdownOutputPath -Force
     }
 }
