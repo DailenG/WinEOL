@@ -7,8 +7,11 @@ function Show-SDCProductReleaseInfo {
     This function retrieves and displays the release information for the Support Death Clock product.
     It includes details such as version, release date, and any relevant notes.
 
+    .PARAMETER ProductWithReleaseInfo
+    The product information in PSObject format that contains release details.
+
     .EXAMPLE
-    Show-SDCProductReleaseInfo
+    PS> Get-SDCProductInfo -ProductName python | Show-SDCProductReleaseInfo
 
     Displays the release information for the Support Death Clock product.
     #>

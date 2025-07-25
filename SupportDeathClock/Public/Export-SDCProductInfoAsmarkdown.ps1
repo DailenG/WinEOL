@@ -9,14 +9,16 @@ function Export-SDCProductInfoAsMarkdown {
     .PARAMETER ProductInfo
         The product information in PSObject format to convert to Markdown.
 
+    .PARAMETER OutputPath
+        The directory path where the Markdown file will be saved. The file will be named based on the product name, replacing spaces with underscores.
+
     .EXAMPLE
-        $pythonInfo | Export-SDCProductInfoAsMarkdown
+        $pythonInfo | Export-SDCProductInfoAsMarkdown -OutputPath "C:\ProductInfo"
 
     .NOTES
 
     .OUTPUTS
-        System.String
-        Returns a string containing the Markdown representation of the product information.
+        Markdown file saved to the specified OutputPath.
 
     #>
     [CmdletBinding()]
