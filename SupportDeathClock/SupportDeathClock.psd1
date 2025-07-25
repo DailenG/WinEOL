@@ -12,7 +12,7 @@
 RootModule = 'SupportDeathClock.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.0.4'
+ModuleVersion = '0.1.0'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -63,7 +63,9 @@ PowerShellVersion = '7.0'
 # TypesToProcess = @()
 
 # Format files (.ps1xml) to be loaded when importing this module
-# FormatsToProcess = @()
+ FormatsToProcess = @(
+    'formats/SDCEOLProductReleaseInfo.format.ps1xml'
+ )
 
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
 # NestedModules = @()

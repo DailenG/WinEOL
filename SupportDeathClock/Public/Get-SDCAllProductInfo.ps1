@@ -17,27 +17,28 @@ function Get-SDCAllProductInfo {
     )
 
     $url = "https://endoflife.date/api/v1/products/full"
+
     try {
-        $products = Invoke-RestMethod -Uri $url -ErrorAction Stop
+        $allProducts = Invoke-WebRequest -Uri $url -Method Get -ErrorAction Stop
+
+        if ($null -eq $allProducts) {
+            Write-Error "No productS found."
+            return
+        }
+
+        # Convert the JSON response to a PowerShell object
+        $allProducts = ($allProducts.Content| ConvertFrom-Json).result
+
+        # Add pstypenames for each product, this will be used for custom formatting and validation
+        foreach($p in $allProducts) {
+            $p.pstypenames.insert(0, "SupportDeathClock.EOLProductInfoWithReleases")
+        }
+
+        Write-Verbose "All Product information retrieved successfully."
+        $allProducts
     }
     catch {
         Write-Error "Failed to retrieve all product information. Error: $_"
         return
     }
-    if ($null -eq $products) {
-        Write-Error "No productS found."
-        return
-    }
-
-    $productReleaseInfo = [System.Collections.Generic.List[PSCustomObject]]::new()
-
-    foreach($result in $products.result) {
-        foreach ($prodRelease in $result.releases) {
-            $releaseAsObj = Format-ProductResultAsObject -ProductName $result.name -ProductResult $prodRelease
-            $productReleaseInfo.Add($releaseAsObj)
-        }
-    }
-
-    Write-Verbose "All Product information retrieved successfully."
-    return $productReleaseInfo
 }

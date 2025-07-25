@@ -4,6 +4,12 @@ A PowerShell module which uses the [endoflife.date](https://endoflife.date/) api
 
 If it's not obvious, this is still under development 😊
 
+## v0.1.0
+
+- Added custom formatter and datatypes for product release information
+- Added function to export product and release information to markdown
+
+
 ## Installation
 
 ```powershell
@@ -14,23 +20,7 @@ Install-Module -Name SupportDeathClock
 
 The following are some examples of using the main commands
 
-These cmdlets return a subset of the fields for each product. The fields include values, when available, for:
-
-| Field Name   | Description |
-| ----------   | ------------|
-| ProductName  | Name of the product |
-| prodRelease  | Version Number |
-| prodReleased | Release date of Product version |
-| OutOfActiveSupport | Whether the product version still receives active support, True or False |
-| ActiveSupportEnds | Date on which active support will end |
-| EndOfLife | Whether the product version is EOL, True or False |
-| SecuritySupportEnds | End of Life date for product version |
-| Maintained | Whether the product version still receives some level of support |
-| LatestBuild | The latest build number of this product version |
-| LatestBuildprodReleaseDate | Release date of the latest build of the current version |
-| LatestBuildUrl | Link to the changelog or release notes |
-| IsLts | Whether this product version still receives long term support |
-| LtsFromDate | Start date of the LTS phase for this version of the product |
+> **Note:** The commands now return all the same fields as the [EndOfLife API](https://endoflife.date/docs/api/v1/). See the schema section for more information about what each field means.
 
 ### Get-SDCAllProductInfo
 
@@ -61,6 +51,32 @@ Get-SDCProductInfo -ProductName python -Release 3.5
 # This will return information regarding the latest versions of a product, in this case python.
 Get-SDCProductInfo -ProductName python -Latest
 ```
+
+### Show-SDCProductReleaseInfo
+
+This command can be used with the output from the `Get-SDCAllProductInfo` and `Get-SDCProductInfo -ProductName xxx`. By default, it will show a custom formatter view of the release information for the product(s) passed in. You can use `Format-List *` to see all the properties of the object.
+
+```powershell
+
+Get-SDCAllProductInfo | Show-SDCProductReleaseInfo
+
+# This will return information regarding all versions of python
+Get-SDCProductInfo -ProductName python | Show-SDCProductReleaseInfo
+```
+
+Example Output:
+![Custom Formatter output for Show-SDCProductReleaseInfo Command](image.png)
+
+### Export-SDCProductInfoAsmarkdown
+
+This command can be used with the output from the `Get-SDCAllProductInfo` and `Get-SDCProductInfo -ProductName xxx` to produce Markdown files. The name of the markdown file will match the name of the product being passed in.
+
+```powershell
+
+Get-SDCAllProductInfo | Export-SDCProductInfoAsMarkdown -OutputPath "D:\Temp\SDC\"
+
+```
+
 
 ### Get-SDCAllProductsByCategory
 
