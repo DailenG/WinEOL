@@ -1,0 +1,89 @@
+<!--
+Format type data generated for WinEOL
+Refactored by: Gemini
+-->
+<Configuration>
+  <ViewDefinitions>
+    <View>
+      <Name>default</Name>
+      <ViewSelectedBy>
+        <TypeName>WinEOL.ProductInfo</TypeName>
+      </ViewSelectedBy>
+      <GroupBy>
+        <PropertyName>Product</PropertyName>
+        <Label>Product</Label>
+      </GroupBy>
+      <TableControl>
+        <AutoSize />
+        <TableHeaders>
+          <TableColumnHeader>
+            <Label>Cycle</Label>
+            <Width>10</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>ReleaseDate</Label>
+            <Width>15</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>EOL</Label>
+            <Width>15</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Status</Label>
+            <Width>10</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>DaysLeft</Label>
+            <Width>10</Width>
+            <Alignment>right</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Latest</Label>
+            <Width>15</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem>
+                <PropertyName>cycle</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>releaseDate</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>eol</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>
+                $s = $_.Status
+                $color = $PSStyle.Foreground.Green
+                if ($s -eq 'EOL') { $color = $PSStyle.Foreground.Red }
+                elseif ($s -eq 'NearEOL') { $color = $PSStyle.Foreground.Yellow }
+                "$color$s$($PSStyle.Reset)"
+                </ScriptBlock>
+              </TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>
+                 $d = $_.DaysRemaining
+                 $color = $PSStyle.Foreground.Green
+                 if ($d -lt 0) { $color = $PSStyle.Foreground.Red; $d = 0 }
+                 elseif ($d -le 60) { $color = $PSStyle.Foreground.Yellow }
+                 "$color$d$($PSStyle.Reset)"
+                </ScriptBlock>
+              </TableColumnItem>
+               <TableColumnItem>
+                <PropertyName>latest</PropertyName>
+              </TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+  </ViewDefinitions>
+</Configuration>
