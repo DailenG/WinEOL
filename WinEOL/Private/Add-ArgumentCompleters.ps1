@@ -1,4 +1,4 @@
-function Add-ArgumentCompleters{
+function Add-ArgumentCompleters {
     $acProductName = {
         # Although it is called ProductName, it is actually the product label
         # The label property contains more information than just the product name, so we will use it to complete the parameter
@@ -51,7 +51,7 @@ function Add-ArgumentCompleters{
 
         $wordToComplete = $wordToComplete.trim("'")
 
-        if($fakeBoundParameters.ContainsKey('ProductName')){
+        if ($fakeBoundParameters.ContainsKey('ProductName')) {
             $productName = $fakeBoundParameters['ProductName']
             $url = "https://endoflife.date/api/v1/products/$($productName)"
 
@@ -66,7 +66,7 @@ function Add-ArgumentCompleters{
 
 
     # Register argument completer to specific command and (non-standard) parameters
-    #Register-ArgumentCompleter -CommandName "Get-SDCProductInfo" -ParameterName "ProductName" -ScriptBlock $acProductName
+    #Register-ArgumentCompleter -CommandName "Get-WinEOL" -ParameterName "ProductName" -ScriptBlock $acProductName
 
     # Auto Register argument completers to standard parameters in module
 
@@ -76,9 +76,9 @@ function Add-ArgumentCompleters{
     foreach ($command in $commands) {
         if ($command.Parameters.ContainsKey('ProductName')) {
             $splat = @{
-                CommandName = $command.Name
+                CommandName   = $command.Name
                 ParameterName = 'ProductName'
-                ScriptBlock = $acProductName
+                ScriptBlock   = $acProductName
             }
 
             Register-ArgumentCompleter @splat
@@ -86,9 +86,9 @@ function Add-ArgumentCompleters{
 
         if ($command.Parameters.ContainsKey('Category')) {
             $splat = @{
-                CommandName = $command.Name
+                CommandName   = $command.Name
                 ParameterName = 'Category'
-                ScriptBlock = $acCategory
+                ScriptBlock   = $acCategory
             }
 
             Register-ArgumentCompleter @splat
@@ -96,9 +96,9 @@ function Add-ArgumentCompleters{
 
         if ($command.Parameters.ContainsKey('Tag')) {
             $splat = @{
-                CommandName = $command.Name
+                CommandName   = $command.Name
                 ParameterName = 'Tag'
-                ScriptBlock = $acTags
+                ScriptBlock   = $acTags
             }
 
             Register-ArgumentCompleter @splat
@@ -106,12 +106,22 @@ function Add-ArgumentCompleters{
 
         if ($command.Parameters.ContainsKey('Release')) {
             $splat = @{
-                CommandName = $command.Name
+                CommandName   = $command.Name
                 ParameterName = 'Release'
-                ScriptBlock = $acRelease
+                ScriptBlock   = $acRelease
             }
 
             Register-ArgumentCompleter @splat
+        }
+        
+        # Add Status completer
+        if ($command.Parameters.ContainsKey('Status')) {
+            Register-ArgumentCompleter -CommandName $command.Name -ParameterName 'Status' -ScriptBlock {
+                param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+                'All', 'Active', 'EOL', 'NearEOL' | Where-Object { $_ -like "$wordToComplete*" } | ForEach-Object {
+                    [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
+                }
+            }
         }
     }
 }
