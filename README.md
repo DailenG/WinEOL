@@ -1,144 +1,85 @@
-# SupportDeathClock
+# WinEOL
 
-A PowerShell module which uses the [endoflife.date](https://endoflife.date/) api to report on product support dates for different version of a product.
+A Windows-focused PowerShell module that uses the [endoflife.date](https://endoflife.date/) API to report on product support dates, lifecycle status, and release information.
 
-If it's not obvious, this is still under development 😊
+## Features
 
-## v0.1.0
-
-- Added custom formatter and datatypes for product release information
-- Added function to export product and release information to markdown
-
+- **Windows Centric**: Dedicated wrappers for `Windows 11` and `Windows Server`.
+- **Smart Filtering**: Filter by Edition (Home/Pro/Enterprise), Status (Active/EOL), or Version.
+- **Rich Output**: Returns objects with `Status` (Active, NearEOL, EOL), `DaysRemaining`, and `IsSupported` properties.
+- **Caching**: Session-level caching to minimize API calls and improve performance.
+- **Wildcard Support**: Easily find products like `windows-*` or `python`.
 
 ## Installation
 
 ```powershell
-Install-Module -Name SupportDeathClock
+Install-Module -Name WinEOL
 ```
 
-## Getting Started
+## Usage
 
-The following are some examples of using the main commands
+### Get-WinEOL
 
-> **Note:** The commands now return all the same fields as the [EndOfLife API](https://endoflife.date/docs/api/v1/). See the schema section for more information about what each field means.
-
-### Get-SDCAllProductInfo
-
-This command uses the [https://endoflife.date/api/v1/products/full](https://endoflife.date/docs/api/v1/#/Products/products_full) end point and returns a list of all the products maintained in the endoflife.date data, including all releases. To reduce the amount of data transferred it is preferable to use `Get-SDCAllProductInfo`.
+The core function to retrieve product information.
 
 ```powershell
-Get-SDCAllProductInfo
+# Get info for Windows 11
+Get-WinEOL -ProductName "windows-11"
+
+# Search for all Windows products
+Get-WinEOL -ProductName "windows-*"
+
+# Get product info filtered by specific status
+Get-WinEOL -ProductName "windows-11" -Status Active
 ```
 
-### Get-SDCProductInfo
+### Get-Win11EOL
 
-This command can be in the following ways
+A wrapper specifically for Windows 11 with edition support.
 
 ```powershell
-# This will return information regarding all versions of a product, in this case python
-# ProductName uses an ArgumentCompleter, so you will be able to use tab completion to see all the possible product names
-Get-SDCProductInfo -ProductName python
+# Get all Active Windows 11 Pro releases
+Get-Win11EOL -Pro -Status Active
 
+# Get all Enterprise releases
+Get-Win11EOL -Enterprise
 ```
+
+### Get-WinServerEOL
+
+A wrapper for Windows Server versions.
 
 ```powershell
-# This will return information regarding a specific versions of a product, in this case python version 3.5
-# Release uses an ArgumentCompleter, so you will be able to use tab completion to see all the possible versions of the product
-Get-SDCProductInfo -ProductName python -Release 3.5
+# Get all Windows Server versions
+Get-WinServerEOL
+
+# Show only supported Server versions
+Get-WinServerEOL -Status Active
 ```
 
-```powershell
-# This will return information regarding the latest versions of a product, in this case python.
-Get-SDCProductInfo -ProductName python -Latest
-```
+### Output
 
-### Show-SDCProductReleaseInfo
+The module returns `WinEOL.ProductInfo` objects with the following properties (default view):
 
-This command can be used with the output from the `Get-SDCAllProductInfo` and `Get-SDCProductInfo -ProductName xxx`. By default, it will show a custom formatter view of the release information for the product(s) passed in. You can use `Format-List *` to see all the properties of the object.
+![WinEOL Output Example](docs/images/wineol_output.png)
 
-```powershell
+- **Product**: Product Name
+- **Cycle**: Version/Cycle
+- **ReleaseDate**: Release Date
+- **EOL**: The End of Life Date
+- **Status**: Active (Green), NearEOL (Yellow), EOL (Red)
+- **DaysRemaining**: Days until EOL
 
-Get-SDCAllProductInfo | Show-SDCProductReleaseInfo
+## Contributing
 
-# This will return information regarding all versions of python
-Get-SDCProductInfo -ProductName python | Show-SDCProductReleaseInfo
-```
+Contributions are welcome! Please fork the repository and submit a pull request.
 
-Example Output:
-![Custom Formatter output for Show-SDCProductReleaseInfo Command](image.png)
+## Credits
 
-### Export-SDCProductInfoAsmarkdown
+Refactored from the [SupportDeathClock](https://github.com/Nibushi/SupportDeathClock) module by **Simon Alexander**.
+This project builds upon the original work to provide a Windows-focused experience.
 
-This command can be used with the output from the `Get-SDCAllProductInfo` and `Get-SDCProductInfo -ProductName xxx` to produce Markdown files. The name of the markdown file will match the name of the product being passed in.
+## License
 
-```powershell
+This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
 
-Get-SDCAllProductInfo | Export-SDCProductInfoAsMarkdown -OutputPath "D:\Temp\SDC\"
-
-```
-
-
-### Get-SDCAllProductsByCategory
-
-The endpoint only returns a limited set of data regarding each products. Useful for seeing which products are supported without having to return all the products. Categories include:
-
-- app
-- database
-- device
-- framework
-- lang
-- os
-- server-app
-- service
-- standard
-
-```powershell
-# Returns a list of all the products available for a specific category
-# Category uses an ArgumentCompleter, so you will be able to use tab completion to see all possible categories
-Get-SDCAllProductsByCategory -Category os
-
-name     : windows
-aliases  : {}
-label    : Microsoft Windows
-category : os
-tags     : {microsoft, os, windows}
-uri      : https://endoflife.date/api/v1/products/windows
-```
-
-### Get-SDCAllProductsByTag
-
-Similar to the `Get-SDCAllProductsByCategory` cmdlet. The endpoint only returns a limited set of data regarding each products.
-
-```powershell
-# Returns a list of all the products available for a specific tag
-# Tag uses an ArgumentCompleter, so you will be able to use tab completion to see all possible Tags
-Get-SDCAllProductsByTag -Tag microsoft
-
-name     : windows
-aliases  : {}
-label    : Microsoft Windows
-category : os
-tags     : {microsoft, os, windows}
-uri      : https://endoflife.date/api/v1/products/windows
-```
-
-### Get-SDCProductReleaseNumber
-
-Returns a list of all available Releases for a product
-
-```powershell
-# ProductName uses an ArgumentCompleter, so you will be able to use tab completion to see all the possible product names
-Get-SDCProductReleaseNumber -ProductName flux
-
-Release
--------
-2.6
-2.5
-2.4
-2.3
-2.2
-2.1
-2.0
-1.25
-
-```
