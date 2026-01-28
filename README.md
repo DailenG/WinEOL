@@ -8,7 +8,7 @@ A Windows-focused PowerShell module that uses the [endoflife.date](https://endof
 - **Smart Filtering**: Filter by Edition (Home/Pro/Enterprise), Status (Active/EOL), or Version.
 - **Rich Output**: Returns objects with `Status` (Active, NearEOL, EOL), `DaysRemaining`, and `IsSupported` properties.
 - **Caching**: Session-level caching to minimize API calls and improve performance.
-- **Wildcard Support**: Easily find products like `windows-*` or `python`.
+- **Wildcard Support**: Easily find products like `windows-*` or `windows-server-2019`.
 
 ## Installation
 

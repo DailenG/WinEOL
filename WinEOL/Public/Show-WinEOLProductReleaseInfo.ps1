@@ -11,7 +11,7 @@ function Show-WinEOLReleaseInfo {
     The product information in PSObject format that contains release details.
 
     .EXAMPLE
-    PS> Get-WinEOLAllProducts | Where-Object Name -like "*python*" | Show-WinEOLReleaseInfo
+    PS> Get-WinEOLAllProducts | Where-Object Name -like "*windows*" | Show-WinEOLReleaseInfo
     #>
 
     [CmdletBinding()]

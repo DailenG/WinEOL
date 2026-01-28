@@ -11,7 +11,7 @@ function Get-WinEOL {
         It also includes smart fallback logic for complex products like 'windows-11' that are part of the 'windows' product availability.
 
     .PARAMETER ProductName
-        The name of the product to query (e.g., 'windows-11', 'python'). 
+        The name of the product to query (e.g., 'windows-11', 'windows-server-2022'). 
         Supports wildcards (e.g., 'windows-*').
 
     .PARAMETER Release
@@ -50,13 +50,13 @@ function Get-WinEOL {
         Retrieves all active Windows Server versions.
 
     .EXAMPLE
-        Get-WinEOL -ProductName "python" -Latest
+        Get-WinEOL -ProductName "windows-server-2022" -Latest
         Retrieves the latest Python release info.
     #>
     [CmdletBinding(DefaultParameterSetName = 'Default')]
     param(
-        [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
-        [string]$ProductName,
+        [Parameter(Mandatory = $false, Position = 0, ValueFromPipeline = $true)]
+        [string]$ProductName = 'windows-*',
 
         [Parameter()]
         [string]$Release,
@@ -96,6 +96,12 @@ function Get-WinEOL {
     }
 
     process {
+        # Input Validation (Security & Ruggedness)
+        # Allow alphanumeric, hyphens, and wildcards.
+        if ($ProductName -notmatch '^[a-zA-Z0-9\-\*\.]+$') {
+            Throw "Invalid ProductName '$ProductName'. Product names must only contain letters, numbers, hyphens, periods, or wildcards (*). This check prevents malformed requests."
+        }
+
         # Handle implied product name suffix (-W / -E)
         $suffixFilter = $null
         if ($Pro -or $HomeEdition -or $Workstation) { $suffixFilter = "*W" }
