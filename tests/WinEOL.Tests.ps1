@@ -7,21 +7,30 @@ InModuleScope WinEOL {
         
         Context "Get-WinEOL Parameters & Validation" {
             It "Should default ProductName to 'windows-*' if not specified" {
-                # Mocking Invoke-RestMethod. 
-                # 1. 'products' endpoint returns list of slugs (strings)
-                # 2. 'products/windows-11' endpoint returns details
+                # Mocking Invoke-RestMethod for v1 API
                 Mock Invoke-RestMethod { 
-                    # Pester binds parameters. Use $Uri.
-                    if ($Uri -match '/products$') { return @('windows-11') }
-                    
-                    # Fallback for specific product details
-                    return @(
-                        [PSCustomObject]@{ 
-                            name  = 'windows-11'
-                            cycle = '23H2'
-                            eol   = '2025-01-01' 
+                    # 1. Products endpoint returns v1 structure with result array
+                    if ($Uri -match '/products$') { 
+                        return [PSCustomObject]@{
+                            result = @(
+                                [PSCustomObject]@{ name = 'windows' },
+                                [PSCustomObject]@{ name = 'windows-server' }
+                            )
                         }
-                    )
+                    }
+                    
+                    # 2. Specific product endpoint returns v1 structure with releases
+                    return [PSCustomObject]@{
+                        result = [PSCustomObject]@{
+                            releases = @(
+                                [PSCustomObject]@{ 
+                                    name  = '11-24h2-w'
+                                    eolFrom = '2026-10-13'
+                                    isEol = $false
+                                }
+                            )
+                        }
+                    }
                 }
 
                 # Mock Cache to prevent using real cache
@@ -30,7 +39,7 @@ InModuleScope WinEOL {
 
                 $result = Get-WinEOL
                 $result | Should -Not -BeNullOrEmpty
-                $result[0].Product | Should -Be "windows-11"
+                $result[0].Product | Should -BeIn @('windows', 'windows-server')
             }
 
             It "Should throw error for invalid characters in ProductName" {
@@ -57,11 +66,49 @@ InModuleScope WinEOL {
                 $res | Should -Be "Called Base Function"
             }
 
+            It "Get-Win11EOL should pass Version parameter to Get-WinEOL" {
+                Mock Get-WinEOL { return "Called with Version" } -ParameterFilter { $ProductName -eq 'windows-11' -and $Version -eq '25H2' }
+                
+                $res = Get-Win11EOL -Version "25H2"
+                $res | Should -Be "Called with Version"
+            }
+
+            It "Get-Win11ProEOL should call Get-Win11EOL with -Pro" {
+                Mock Get-Win11EOL { return "Called Pro Wrapper" } -ParameterFilter { $Pro -eq $true }
+                
+                $res = Get-Win11ProEOL
+                $res | Should -Be "Called Pro Wrapper"
+            }
+
+            It "Get-Win11ProEOL should pass Version parameter" {
+                Mock Get-Win11EOL { return "Called Pro with Version" } -ParameterFilter { $Pro -eq $true -and $Version -eq '24H2' }
+                
+                $res = Get-Win11ProEOL -Version "24H2"
+                $res | Should -Be "Called Pro with Version"
+            }
+
             It "Get-WinServerEOL should call Get-WinEOL with 'windows-server-*'" {
                 Mock Get-WinEOL { return "Called Base Function" } -ParameterFilter { $ProductName -eq 'windows-server-*' }
                 
                 $res = Get-WinServerEOL
                 $res | Should -Be "Called Base Function"
+            }
+        }
+
+        Context "Version Filtering" {
+            It "Should filter results by Version parameter" {
+                Mock Invoke-RestMethod { 
+                    return @(
+                        [PSCustomObject]@{ name = '11-25h2-e'; cycle = '11-25h2-e'; eol = '2028-10-10' },
+                        [PSCustomObject]@{ name = '11-24h2-e'; cycle = '11-24h2-e'; eol = '2027-10-12' }
+                    ) 
+                }
+                Mock Get-WinEOLCache { return @{} }
+                Mock Set-WinEOLCache { }
+
+                $res = Get-WinEOL -ProductName "windows-11" -Version "25H2"
+                $res.Count | Should -Be 1
+                $res[0].Cycle | Should -BeLike "*25h2*"
             }
         }
 
