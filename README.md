@@ -31,6 +31,9 @@ Get-WinEOL -ProductName "windows-*"
 
 # Get product info filtered by specific status
 Get-WinEOL -ProductName "windows-11" -Status Active
+
+# Filter by version/feature release
+Get-WinEOL -ProductName "windows-11" -Version "25H2"
 ```
 
 ### Get-Win11EOL
@@ -43,6 +46,25 @@ Get-Win11EOL -Pro -Status Active
 
 # Get all Enterprise releases
 Get-Win11EOL -Enterprise
+
+# Filter by version
+Get-Win11EOL -Version "25H2"
+Get-Win11EOL -Pro -Version "24H2" -Status Active
+```
+
+### Get-Win11ProEOL
+
+A convenience wrapper for Windows 11 Pro editions.
+
+```powershell
+# Get all Windows 11 Pro releases
+Get-Win11ProEOL
+
+# Get only active Pro releases
+Get-Win11ProEOL -Status Active
+
+# Get specific version
+Get-Win11ProEOL -Version "25H2"
 ```
 
 ### Get-WinServerEOL

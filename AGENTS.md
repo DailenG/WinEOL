@@ -11,7 +11,7 @@ WinEOL is a Windows-focused PowerShell module that wraps the [endoflife.date](ht
 This follows standard PowerShell module conventions:
 - **WinEOL/WinEOL.psm1**: Root module that dot-sources all functions from Public/ and Private/
 - **WinEOL/WinEOL.psd1**: Module manifest defining metadata, PowerShell version requirements (7.0+), and exported functions
-- **WinEOL/Public/**: Contains exported cmdlets (Get-WinEOL, Get-Win11EOL, Get-WinServerEOL, etc.)
+- **WinEOL/Public/**: Contains exported cmdlets (Get-WinEOL, Get-Win11EOL, Get-Win11ProEOL, Get-WinServerEOL, etc.)
 - **WinEOL/Private/**: Contains internal functions (caching, connection testing, argument completers)
 - **WinEOL/formats/**: Custom format files (.ps1xml) defining table views with color-coded status output
 
@@ -37,6 +37,7 @@ All functions call the endoflife.date API (`https://endoflife.date/api/v1/`). Th
 
 ### Filtering System
 - **Wildcard support**: Product names like `windows-*` fetch all products and recursively call `Get-WinEOL` for matches
+- **Version filters**: `-Version` parameter filters by feature release (e.g., `25H2`, `24H2`) matching against the cycle name
 - **Edition filters**: `-Pro`, `-HomeEdition`, `-Enterprise`, `-Education`, `-IoT` filter by release name suffix (`*-W` or `*-E`)
 - **Status filters**: `-Status Active|EOL|NearEOL|All` filter enriched results
 
@@ -58,10 +59,14 @@ Test-ModuleManifest .\WinEOL\WinEOL.psd1
 ```
 
 ### Testing Functions
-There are no formal tests (Pester or otherwise) in this repository. Manual testing requires:
+Basic Pester tests exist in `tests/WinEOL.Tests.ps1`. Manual testing requires:
 ```powershell
 # Test wildcard matching
 Get-WinEOL -ProductName "windows-*"
+
+# Test version filtering
+Get-Win11EOL -Version "25H2"
+Get-Win11ProEOL -Version "24H2" -Status Active
 
 # Test edition filtering
 Get-Win11EOL -Pro -Status Active
@@ -72,6 +77,9 @@ Get-WinEOL -ProductName "windows-11"
 # Test caching (second call should be instant)
 Measure-Command { Get-WinEOL -ProductName "windows-server" }
 Measure-Command { Get-WinEOL -ProductName "windows-server" }
+
+# Run Pester tests
+Invoke-Pester -Path .\tests\WinEOL.Tests.ps1
 ```
 
 ### Publishing
