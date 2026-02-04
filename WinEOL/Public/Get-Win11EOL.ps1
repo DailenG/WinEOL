@@ -22,12 +22,19 @@ function Get-Win11EOL {
     .PARAMETER IoT
         Filter for IoT Enterprise edition.
 
+    .PARAMETER Version
+        Filter by version/feature release (e.g., '25H2', '24H2', '23H2'). Supports wildcards.
+
     .PARAMETER Status
         Filter results by status: 'All', 'Active', 'EOL', 'NearEOL'.
 
     .EXAMPLE
         Get-Win11EOL -Pro -Status Active
         Returns currently supported Windows 11 Pro versions.
+
+    .EXAMPLE
+        Get-Win11EOL -Version 25H2
+        Returns all Windows 11 25H2 versions (Pro and Enterprise).
     #>
     [CmdletBinding()]
     param(
@@ -37,6 +44,7 @@ function Get-Win11EOL {
         [switch]$Enterprise,
         [switch]$Education,
         [switch]$IoT,
+        [string]$Version,
         [string]$Status = 'All'
     )
 
@@ -45,6 +53,7 @@ function Get-Win11EOL {
         Status      = $Status
     }
 
+    if ($Version) { $params.Version = $Version }
     if ($Pro) { $params.Pro = $true }
     if ($HomeEdition) { $params.Home = $true }
     if ($Enterprise) { $params.Enterprise = $true }
