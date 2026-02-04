@@ -103,7 +103,7 @@
             LicenseUri = 'https://opensource.org/licenses/MIT'
 
             # A URL to the main website for this project.
-            ProjectUri = 'https://github.com/Nibushi/SupportDeathClock'
+            ProjectUri = 'https://github.com/DailenG/WinEOL'
 
             # A URL to an icon representing this module.
             # IconUri = ''
