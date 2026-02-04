@@ -38,12 +38,20 @@ function Get-WinEOL {
     .PARAMETER IoT
         Filter for 'IoT' edition (implies *-E suffix).
 
+    .PARAMETER Version
+        Filter by version/feature release (e.g., '25H2', '24H2', '23H2'). Supports wildcards.
+        Filters results where the cycle contains the specified version string.
+
     .PARAMETER Status
         Filter by lifecycle status. Options: 'All', 'Active', 'EOL', 'NearEOL'. Default is 'All'.
 
     .EXAMPLE
         Get-WinEOL -ProductName "windows-11"
         Retrieves all Windows 11 release information.
+
+    .EXAMPLE
+        Get-WinEOL -ProductName "windows-11" -Version "25H2"
+        Retrieves Windows 11 25H2 release information.
 
     .EXAMPLE
         Get-WinEOL -ProductName "windows-server-*" -Status Active
@@ -66,6 +74,9 @@ function Get-WinEOL {
 
         [Parameter()]
         [switch]$Refresh,
+
+        [Parameter()]
+        [string]$Version,
 
         # Edition Filters (Implied naming convention handling)
         [Parameter(ParameterSetName = 'Default')]
@@ -117,7 +128,9 @@ function Get-WinEOL {
             
             if ($null -eq $allProducts) {
                 try {
-                    $allProducts = (Invoke-RestMethod "https://endoflife.date/api/v1/products" -ErrorAction Stop)
+                    $response = (Invoke-RestMethod "https://endoflife.date/api/v1/products" -ErrorAction Stop)
+                    # Extract product names from v1 API response
+                    $allProducts = $response.result | Select-Object -ExpandProperty name
                     Set-WinEOLCache -Key $cacheKey -Value $allProducts
                 }
                 catch {
@@ -145,7 +158,7 @@ function Get-WinEOL {
             }
 
             foreach ($m in $foundProducts) {
-                Get-WinEOL -ProductName $m -Refresh:$Refresh -Status $Status -Latest:$Latest -Pro:$Pro -HomeEdition:$HomeEdition -Enterprise:$Enterprise -Education:$Education -IoT:$IoT -Workstation:$Workstation
+                Get-WinEOL -ProductName $m -Refresh:$Refresh -Status $Status -Latest:$Latest -Version $Version -Pro:$Pro -HomeEdition:$HomeEdition -Enterprise:$Enterprise -Education:$Education -IoT:$IoT -Workstation:$Workstation
             }
             return
         }
@@ -164,11 +177,17 @@ function Get-WinEOL {
         
         $fallbackMode = $false
         $fallbackFilter = $null
+        $results = @()
 
         if ($null -eq $data) {
             try {
                 $response = Invoke-RestMethod -Uri $url -Method Get -ErrorAction Stop
                 $data = $response
+                # Normalize API response (Handle 'result.releases' wrapper vs direct array)
+                if ($data.result -and $data.result.releases) {
+                    $data = $data.result.releases
+                }
+
                 if ($Latest) { $data = @($data) } 
                 Set-WinEOLCache -Key $cacheKey -Value $data
             }
@@ -198,6 +217,12 @@ function Get-WinEOL {
                         try {
                             $url = "https://endoflife.date/api/v1/products/$fallbackProduct"
                             $data = Invoke-RestMethod -Uri $url -ErrorAction Stop
+                            
+                            # Normalize Fallback Data
+                            if ($data.result -and $data.result.releases) {
+                                $data = $data.result.releases
+                            }
+
                             Set-WinEOLCache -Key "PRODUCT_$fallbackProduct" -Value $data
                         }
                         catch {
@@ -218,8 +243,7 @@ function Get-WinEOL {
             }
         }
 
-        # 4. Object Enrichment & Filtering
-        $results = @()
+
         foreach ($item in $data) {
             # Normalize Cycle/Name
             $cycle = if ($item.cycle) { $item.cycle } else { $item.name }
@@ -234,15 +258,33 @@ function Get-WinEOL {
                 if ($item.name -notlike $suffixFilter) { continue }
             }
 
+            # Apply Version Filter
+            if ($Version) {
+                $versionPattern = "*$Version*"
+                if ($cycle -notlike $versionPattern) { continue }
+            }
+
             # Calculate Days Remaining
             $eolDate = $null
             $days = 0
             $statusStr = "Active"
             $isSupported = $true
              
-            if ($item.eol -and $item.eol -ne $true -and $item.eol -ne $false) {
-                if ($item.eol -as [DateTime]) {
-                    $eolDate = [DateTime]$item.eol
+            # Handle both API formats: v1 API uses 'eolFrom', direct API uses 'eol'
+            $eolValue = if ($item.eolFrom) { $item.eolFrom } else { $item.eol }
+            
+            # Check if already marked as EOL (v1 API)
+            if ($item.PSObject.Properties['isEol'] -and $item.isEol -eq $true) {
+                $statusStr = "EOL"
+                $isSupported = $false
+                if ($eolValue -as [DateTime]) {
+                    $eolDate = [DateTime]$eolValue
+                    $days = ($eolDate - (Get-Date)).Days
+                }
+            }
+            elseif ($eolValue -and $eolValue -ne $true -and $eolValue -ne $false) {
+                if ($eolValue -as [DateTime]) {
+                    $eolDate = [DateTime]$eolValue
                     $days = ($eolDate - (Get-Date)).Days
                     
                     if ($days -lt 0) { 
@@ -252,14 +294,32 @@ function Get-WinEOL {
                     elseif ($days -le 60) { $statusStr = "NearEOL" }
                 }
             }
-            elseif ($item.eol -eq $true) {
+            elseif ($eolValue -eq $true) {
                 # Boolean true usually means EOL in the past or simple "Yes"
                 $statusStr = "EOL"
                 $isSupported = $false
             }
 
-            # Add Properties
-            $obj = $item | Select-Object *, @{Name = "Cycle"; Expression = { $cycle } }, @{Name = "DaysRemaining"; Expression = { $days } }, @{Name = "Status"; Expression = { $statusStr } }, @{Name = "IsSupported"; Expression = { $isSupported } }, @{Name = "Product"; Expression = { $ProductName } }
+            # Add Properties by creating new object with all properties
+            $objProps = [ordered]@{}
+            
+            # Copy existing properties except ones we'll override
+            $excludeProps = @('Cycle', 'EOL', 'DaysRemaining', 'Status', 'IsSupported', 'Product')
+            foreach ($prop in $item.PSObject.Properties) {
+                if ($prop.Name -notin $excludeProps) {
+                    $objProps[$prop.Name] = $prop.Value
+                }
+            }
+            
+            # Add calculated properties
+            $objProps['Cycle'] = $cycle
+            $objProps['EOL'] = $eolDate
+            $objProps['DaysRemaining'] = $days
+            $objProps['Status'] = $statusStr
+            $objProps['IsSupported'] = $isSupported
+            $objProps['Product'] = $ProductName
+            
+            $obj = [PSCustomObject]$objProps
              
             # Add TypeName
             $obj.PSTypeNames.Insert(0, "WinEOL.ProductInfo")
