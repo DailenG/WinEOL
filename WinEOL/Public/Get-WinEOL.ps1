@@ -9,6 +9,8 @@ function Get-WinEOL {
         including calculated status (Active, NearEOL, EOL) and days remaining.
 
         It also includes smart fallback logic for complex products like 'windows-11' that are part of the 'windows' product availability.
+        
+        If run without parameters, it attempts to detect the current system's OS version and edition to return relevant EOL information.
 
     .PARAMETER ProductName
         The name of the product to query (e.g., 'windows-11', 'windows-server-2022'). 
@@ -108,7 +110,58 @@ function Get-WinEOL {
 
     process {
         # Input Validation (Security & Ruggedness)
-        # Allow alphanumeric, hyphens, and wildcards.
+        # Auto-detect system if no param provided
+        if (-not $PSBoundParameters.ContainsKey('ProductName') -and $ProductName -eq 'windows-*') {
+            Write-Verbose "No parameters provided. Detecting current system..."
+            try {
+                $osInfo = Get-CimInstance Win32_OperatingSystem -ErrorAction Stop
+                # ProductType: 1 = Client, 2 = Domain Controller, 3 = Server
+                if ($osInfo.ProductType -eq 1) {
+                    # Client
+                    $ver = [System.Environment]::OSVersion.Version
+                    # Windows 11 check (Build >= 22000)
+                    $clientVer = if ($ver.Build -ge 22000) { "11" } else { "10" }
+                    $ProductName = "windows-$clientVer"
+                    
+                    # Get DisplayVersion (e.g. 22H2)
+                    $reg = Get-ItemProperty "hkLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion" -ErrorAction SilentlyContinue
+                    if ($reg.DisplayVersion) {
+                        $Version = $reg.DisplayVersion
+                    }
+                    
+                    # Edition Check for Suffix
+                    # Detect Enterprise/Education vs Consumer
+                    # OperatingSystemSKU is reliable. 
+                    # 4=Enterprise, 27=Enterprise N, 70=Enterprise E, 72=Enterprise Eval, 121=Education, 122=Education N, 125=Enterprise LTSC
+                    $sku = $osInfo.OperatingSystemSKU
+                    if ($sku -in @(4, 27, 70, 72, 121, 122, 125, 126, 161, 162)) {
+                        $Enterprise = $true
+                    }
+                    else {
+                        # Default to Consumer (Pro/Home)
+                        $Pro = $true
+                    }
+                }
+                else {
+                    # Server
+                    # Extract year from Caption e.g. "Microsoft Windows Server 2019 Datacenter"
+                    if ($osInfo.Caption -match 'Server\s+(\d{4})') {
+                        $year = $matches[1]
+                        $ProductName = "windows-server-$year"
+                    }
+                    else {
+                        $ProductName = 'windows-server'
+                    }
+                }
+                Write-Verbose "Auto-detected: $ProductName, Version: $Version, Enterprise: $Enterprise, Pro: $Pro"
+            }
+            catch {
+                Write-Warning "Failed to detect system info: $_. Falling back to default search."
+            }
+        }
+
+        # Validate ProductName AFTER auto-detection
+        # allow alphanumeric, hyphens, and wildcards.
         if ($ProductName -notmatch '^[a-zA-Z0-9\-\*\.]+$') {
             Throw "Invalid ProductName '$ProductName'. Product names must only contain letters, numbers, hyphens, periods, or wildcards (*). This check prevents malformed requests."
         }

@@ -24,9 +24,9 @@ InModuleScope WinEOL {
                         result = [PSCustomObject]@{
                             releases = @(
                                 [PSCustomObject]@{ 
-                                    name  = '11-24h2-w'
+                                    name    = '11-24h2-w'
                                     eolFrom = '2026-10-13'
-                                    isEol = $false
+                                    isEol   = $false
                                 }
                             )
                         }
@@ -36,6 +36,9 @@ InModuleScope WinEOL {
                 # Mock Cache to prevent using real cache
                 Mock Get-WinEOLCache { return @{} }
                 Mock Set-WinEOLCache { }
+                
+                # Mock Get-CimInstance to fail, forcing fallback to 'windows-*' default
+                Mock Get-CimInstance { throw "Mock Error" }
 
                 $result = Get-WinEOL
                 $result | Should -Not -BeNullOrEmpty
