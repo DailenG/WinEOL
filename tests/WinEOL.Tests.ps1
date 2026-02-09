@@ -1,10 +1,27 @@
-$here = Split-Path -Parent $MyInvocation.MyCommand.Path
-$sut = (Split-Path -Parent $here) + "\WinEOL"
-Import-Module $sut -Force
+$scriptPath = $PSScriptRoot
+if (-not $scriptPath) {
+    if ($MyInvocation.MyCommand.Path) {
+        $scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
+    }
+    else {
+        $scriptPath = Get-Location
+    }
+}
+$moduleRoot = Join-Path $scriptPath "..\WinEOL"
+$manifestPath = "c:\Code\GitHub\daileng\WinEOL\WinEOL\WinEOL.psd1"
 
-InModuleScope WinEOL {
-    Describe "WinEOL Module Tests" {
-        
+# Debug
+Write-Host "Script Path: $scriptPath"
+Write-Host "Module Manifest: $manifestPath"
+
+# Import globally
+Get-Module WinEOL | Remove-Module -Force -ErrorAction SilentlyContinue
+Import-Module $manifestPath -Force
+
+Describe "WinEOL Module Tests" {
+    
+    # InModuleScope is required to mock private functions or internal calls effectively
+    InModuleScope WinEOL {
         Context "Get-WinEOL Parameters & Validation" {
             It "Should default ProductName to 'windows-*' if not specified" {
                 # Mocking Invoke-RestMethod for v1 API
@@ -58,6 +75,32 @@ InModuleScope WinEOL {
                 { Get-WinEOL -ProductName "windows-11" } | Should -Not -Throw
                 { Get-WinEOL -ProductName "windows-10.1" } | Should -Not -Throw
                 { Get-WinEOL -ProductName "*" } | Should -Not -Throw
+            }
+
+            It "Should bypass auto-detection when -ListAvailable is used" {
+                # Setup Mocks
+                Mock Invoke-RestMethod { 
+                    if ($Uri -match '/products$') { 
+                        return [PSCustomObject]@{
+                            result = @([PSCustomObject]@{ name = 'windows' }) 
+                        }
+                    } 
+                    return @()
+                }
+                Mock Get-WinEOLCache { return @{} }
+                Mock Set-WinEOLCache { }
+                
+                # If auto-detection runs, this would be called. 
+                # We can Mock it and Assert it was NOT called using Assert-MockCalled -Times 0
+                Mock Get-CimInstance { return $null } 
+
+                $res = Get-WinEOL -ListAvailable
+                
+                # Should have searched for windows-* (wildcard path)
+                $res | Should -Not -BeNullOrEmpty
+                
+                # Verify Get-CimInstance was NOT called
+                Assert-MockCalled Get-CimInstance -Times 0
             }
         }
 
@@ -142,3 +185,4 @@ InModuleScope WinEOL {
         }
     }
 }
+# End of file

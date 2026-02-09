@@ -61,12 +61,22 @@ function Get-WinEOL {
 
     .EXAMPLE
         Get-WinEOL -ProductName "windows-server-2022" -Latest
-        Retrieves the latest Python release info.
+    .PARAMETER ListAvailable
+        Forces the listing of all available Windows products (default wildcard search), bypassing auto-detection.
+        Alias: List
+
+    .EXAMPLE
+        Get-WinEOL -ListAvailable
+        Lists all Windows products support by the API (windows-*).
     #>
     [CmdletBinding(DefaultParameterSetName = 'Default')]
     param(
         [Parameter(Mandatory = $false, Position = 0, ValueFromPipeline = $true)]
         [string]$ProductName = 'windows-*',
+
+        [Parameter()]
+        [Alias('List')]
+        [switch]$ListAvailable,
 
         [Parameter()]
         [string]$Release,
@@ -111,7 +121,7 @@ function Get-WinEOL {
     process {
         # Input Validation (Security & Ruggedness)
         # Auto-detect system if no param provided
-        if (-not $PSBoundParameters.ContainsKey('ProductName') -and $ProductName -eq 'windows-*') {
+        if (-not $PSBoundParameters.ContainsKey('ProductName') -and -not $ListAvailable -and $ProductName -eq 'windows-*') {
             Write-Verbose "No parameters provided. Detecting current system..."
             try {
                 $osInfo = Get-CimInstance Win32_OperatingSystem -ErrorAction Stop

@@ -6,6 +6,7 @@ A Windows-focused PowerShell module that uses the [endoflife.date](https://endof
 
 - **Windows Centric**: Dedicated wrappers for `Windows 11` and `Windows Server`.
 - **Auto-Detection**: Running without parameters automatically detects the current system's OS (Client/Server), Version, and Edition to return relevant EOL info.
+- **List Available**: Use `-ListAvailable` to see all supported products.
 - **Smart Filtering**: Filter by Edition (Home/Pro/Enterprise), Status (Active/EOL), or Version.
 - **Rich Output**: Returns objects with `Status` (Active, NearEOL, EOL), `DaysRemaining`, and `IsSupported` properties.
 - **Caching**: Session-level caching to minimize API calls and improve performance.
@@ -26,6 +27,9 @@ The core function to retrieve product information.
 ```powershell
 # Automatically detect and retrieve EOL info for the current system
 Get-WinEOL
+
+# List all available products support by the API
+Get-WinEOL -ListAvailable
 
 # Get info for Windows 11
 Get-WinEOL -ProductName "windows-11"
