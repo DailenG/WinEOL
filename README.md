@@ -92,12 +92,13 @@ The module returns `WinEOL.ProductInfo` objects with the following properties (d
 
 ![WinEOL Output Example](docs/images/wineol_output.png)
 
-- **Product**: Product Name
-- **Cycle**: Version/Cycle
-- **ReleaseDate**: Release Date
-- **EOL**: The End of Life Date
-- **Status**: Active (Green), NearEOL (Yellow), EOL (Red)
-- **DaysRemaining**: Days until EOL
+```text
+Product             Cycle     ReleaseDate EOL        Status   DaysLeft Latest
+-------             -----     ----------- ---        ------   -------- ------
+windows-11          24H2      10/01/2024  10/13/2026 Active        610 26100.1
+windows-10          22H2      10/18/2022  10/14/2025 Active        246 19045.5
+windows-server      2022      08/18/2021  10/13/2031 Active       2436 20348.2
+```
 
 ## Contributing
 
