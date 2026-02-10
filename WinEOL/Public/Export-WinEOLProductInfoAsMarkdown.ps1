@@ -1,4 +1,4 @@
-function Export-SDCProductInfoAsMarkdown {
+function Export-WinEOLProductInfoAsMarkdown {
     <#
     .SYNOPSIS
         Converts product information to Markdown.
@@ -13,7 +13,7 @@ function Export-SDCProductInfoAsMarkdown {
         The directory path where the Markdown file will be saved. The file will be named based on the product name, replacing spaces with underscores.
 
     .EXAMPLE
-        $windowsInfo | Export-SDCProductInfoAsMarkdown -OutputPath "C:\ProductInfo"
+        $windowsInfo | Export-WinEOLProductInfoAsMarkdown -OutputPath "C:\ProductInfo"
 
     .NOTES
 
@@ -25,7 +25,7 @@ function Export-SDCProductInfoAsMarkdown {
     param (
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [ValidateScript({
-                'SupportDeathClock.EOLProductInfoWithReleases' -in $_.PSTypeNames
+                'WinEOL.ProductInfoWithReleases' -in $_.PSTypeNames
             })]
         [PSObject]$ProductInfo,
 

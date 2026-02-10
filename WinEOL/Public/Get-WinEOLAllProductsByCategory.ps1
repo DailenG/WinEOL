@@ -1,10 +1,10 @@
-function Get-SDCAllProductsByCategory {
+function Get-WinEOLAllProductsByCategory {
     <#
     .SYNOPSIS
         Retrieves all products for a specified category from the endoflife.date API.
 
     .DESCRIPTION
-        The Get-SDCAllProductsByCategory function queries the endoflife.date API to retrieve
+        The Get-WinEOLAllProductsByCategory function queries the endoflife.date API to retrieve
         all products that belong to a specific category. It returns the product information
         as objects that can be further processed.
 
@@ -12,12 +12,12 @@ function Get-SDCAllProductsByCategory {
         The name of the category for which to retrieve products. This parameter is mandatory.
 
     .EXAMPLE
-        PS> Get-SDCAllProductsByCategory -Category "operating-systems"
+        PS> Get-WinEOLAllProductsByCategory -Category "operating-systems"
 
         Returns all products categorized as operating systems.
 
     .EXAMPLE
-        PS> Get-SDCAllProductsByCategory -Category "databases" -Verbose
+        PS> Get-WinEOLAllProductsByCategory -Category "databases" -Verbose
 
         Returns all database products with verbose output showing the retrieval progress.
 

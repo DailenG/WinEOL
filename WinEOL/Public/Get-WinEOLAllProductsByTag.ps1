@@ -1,10 +1,10 @@
-function Get-SDCAllProductsByTag {
+function Get-WinEOLAllProductsByTag {
     <#
     .SYNOPSIS
         Retrieves all products associated with a specific tag from the endoflife.date API.
 
     .DESCRIPTION
-        The Get-SDCAllProductsByTag function queries the endoflife.date API to retrieve
+        The Get-WinEOLAllProductsByTag function queries the endoflife.date API to retrieve
         all products that are associated with a specific tag. This function helps identify
         software products that share common characteristics or categories.
 
@@ -12,12 +12,12 @@ function Get-SDCAllProductsByTag {
         The tag name to search for in the endoflife.date database. This parameter is mandatory.
 
     .EXAMPLE
-        Get-SDCAllProductsByTag -Tag "Microsoft"
+        Get-WinEOLAllProductsByTag -Tag "Microsoft"
 
         Retrieves all Microsoft products from the endoflife.date API.
 
     .EXAMPLE
-        Get-SDCAllProductsByTag -Tag "Database" -Verbose
+        Get-WinEOLAllProductsByTag -Tag "Database" -Verbose
 
         Retrieves all database-related products with verbose output displaying the retrieval status.
 

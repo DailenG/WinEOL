@@ -50,9 +50,7 @@ Describe "WinEOL Module Tests" {
                     }
                 }
 
-                # Mock Cache to prevent using real cache
-                Mock Get-WinEOLCache { return @{} }
-                Mock Set-WinEOLCache { }
+
                 
                 # Mock Get-CimInstance to fail, forcing fallback to 'windows-*' default
                 Mock Get-CimInstance { throw "Mock Error" }
@@ -69,8 +67,7 @@ Describe "WinEOL Module Tests" {
 
             It "Should allow valid characters (letters, numbers, hyphens, wildcards)" {
                 Mock Invoke-RestMethod { return @() }
-                Mock Get-WinEOLCache { return @{} }
-                Mock Set-WinEOLCache { }
+
 
                 { Get-WinEOL -ProductName "windows-11" } | Should -Not -Throw
                 { Get-WinEOL -ProductName "windows-10.1" } | Should -Not -Throw
@@ -82,13 +79,24 @@ Describe "WinEOL Module Tests" {
                 Mock Invoke-RestMethod { 
                     if ($Uri -match '/products$') { 
                         return [PSCustomObject]@{
-                            result = @([PSCustomObject]@{ name = 'windows' }) 
+                            result = @([PSCustomObject]@{ name = 'windows-11' }) 
                         }
                     } 
-                    return @()
+                    # Return dummy release for specific product call
+                    return [PSCustomObject]@{
+                        result = [PSCustomObject]@{
+                            releases = @(
+                                [PSCustomObject]@{ 
+                                    cycle       = '21H2'
+                                    name        = '21H2'
+                                    eol         = '2099-01-01'
+                                    releaseDate = '2021-01-01'
+                                }
+                            )
+                        }
+                    }
                 }
-                Mock Get-WinEOLCache { return @{} }
-                Mock Set-WinEOLCache { }
+
                 
                 # If auto-detection runs, this would be called. 
                 # We can Mock it and Assert it was NOT called using Assert-MockCalled -Times 0
@@ -149,8 +157,7 @@ Describe "WinEOL Module Tests" {
                         [PSCustomObject]@{ name = '11-24h2-e'; cycle = '11-24h2-e'; eol = '2027-10-12' }
                     ) 
                 }
-                Mock Get-WinEOLCache { return @{} }
-                Mock Set-WinEOLCache { }
+
 
                 $res = Get-WinEOL -ProductName "windows-11" -Version "25H2"
                 $res.Count | Should -Be 1
@@ -171,8 +178,7 @@ Describe "WinEOL Module Tests" {
                         }
                     ) 
                 }
-                Mock Get-WinEOLCache { return @{} }
-                Mock Set-WinEOLCache { }
+
 
                 $res = Get-WinEOL -ProductName "windows-11"
                 $p = $res[0]
