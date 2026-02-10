@@ -236,7 +236,7 @@ function Get-WinEOL {
                     Write-Verbose "Detected Windows version '$($matches[1])'. Redirecting to 'windows' product."
                     $fallbackProduct = 'windows'
                     $fallbackFilter = $matches[1] + "*"
-                    $fallbackMode = true
+                    $fallbackMode = $true
                 }
                 elseif ($ProductName -match '^windows-server-(.*)$') {
                     Write-Verbose "Detected Windows Server version '$($matches[1])'. Redirecting to 'windows-server' product."
@@ -244,7 +244,7 @@ function Get-WinEOL {
                     $fallbackFilter = "*" + $matches[1] + "*" 
                     # Note: Server versions are like "2019", "2012-r2". Regex capture needs match.
                     # windows-server-2019 -> match 1 = 2019. Filter *2019*.
-                    $fallbackMode = true
+                    $fallbackMode = $true
                 }
                     
                 if ($fallbackMode) {

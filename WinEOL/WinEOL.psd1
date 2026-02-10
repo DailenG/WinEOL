@@ -4,9 +4,7 @@
     RootModule        = 'WinEOL.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '1.2.2'
-
-
+    ModuleVersion     = '1.2.3'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -103,7 +101,7 @@
             # IconUri = ''
 
             # ReleaseNotes of this module
-            ReleaseNotes = 'Remove local caching to simplify logic. Thanks to vim_vs_emacs for the suggestion.'
+            ReleaseNotes = 'Fix boolean typo in fallback logic.'
 
             # Prerelease string of this module
             # Prerelease = ''
