@@ -9,13 +9,14 @@ Refactored by: Gemini
       <ViewSelectedBy>
         <TypeName>WinEOL.ProductInfo</TypeName>
       </ViewSelectedBy>
-      <GroupBy>
-        <PropertyName>Product</PropertyName>
-        <Label>Product</Label>
-      </GroupBy>
       <TableControl>
         <AutoSize />
         <TableHeaders>
+          <TableColumnHeader>
+            <Label>Product</Label>
+            <Width>20</Width>
+            <Alignment>left</Alignment>
+          </TableColumnHeader>
           <TableColumnHeader>
             <Label>Cycle</Label>
             <Width>10</Width>
@@ -51,13 +52,20 @@ Refactored by: Gemini
           <TableRowEntry>
             <TableColumnItems>
               <TableColumnItem>
-                <PropertyName>cycle</PropertyName>
+                <PropertyName>Product</PropertyName>
               </TableColumnItem>
               <TableColumnItem>
-                <PropertyName>releaseDate</PropertyName>
+                <PropertyName>Cycle</PropertyName>
               </TableColumnItem>
               <TableColumnItem>
-                <PropertyName>eol</PropertyName>
+                <ScriptBlock>
+                if ($_.ReleaseDate) { "{0:d}" -f $_.ReleaseDate }
+                </ScriptBlock>
+              </TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>
+                if ($_.EOL) { "{0:d}" -f $_.EOL }
+                </ScriptBlock>
               </TableColumnItem>
               <TableColumnItem>
                 <ScriptBlock>

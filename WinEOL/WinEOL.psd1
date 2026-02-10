@@ -4,7 +4,7 @@
     RootModule        = 'WinEOL.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '1.2.0'
+    ModuleVersion     = '1.2.1'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -92,16 +92,16 @@
             # Tags = @('endoflife','Windows','EOL','lifecycle','support','Dailen')
 
             # A URL to the license for this module.
-            LicenseUri = 'https://opensource.org/licenses/MIT'
+            LicenseUri   = 'https://opensource.org/licenses/MIT'
 
             # A URL to the main website for this project.
-            ProjectUri = 'https://github.com/DailenG/WinEOL'
+            ProjectUri   = 'https://github.com/DailenG/WinEOL'
 
             # A URL to an icon representing this module.
             # IconUri = ''
 
             # ReleaseNotes of this module
-            # ReleaseNotes = ''
+            ReleaseNotes = 'Fix Output display and Date formatting. Thanks to BlackV for the fix ideas.'
 
             # Prerelease string of this module
             # Prerelease = ''

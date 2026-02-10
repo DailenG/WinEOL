@@ -366,8 +366,13 @@ function Get-WinEOL {
             # Add Properties by creating new object with all properties
             $objProps = [ordered]@{}
             
+            $releaseDate = $null
+            if ($item.releaseDate -and ($item.releaseDate -as [DateTime])) {
+                $releaseDate = [DateTime]$item.releaseDate
+            }
+
             # Copy existing properties except ones we'll override
-            $excludeProps = @('Cycle', 'EOL', 'DaysRemaining', 'Status', 'IsSupported', 'Product')
+            $excludeProps = @('Cycle', 'EOL', 'DaysRemaining', 'Status', 'IsSupported', 'Product', 'ReleaseDate')
             foreach ($prop in $item.PSObject.Properties) {
                 if ($prop.Name -notin $excludeProps) {
                     $objProps[$prop.Name] = $prop.Value
@@ -376,6 +381,7 @@ function Get-WinEOL {
             
             # Add calculated properties
             $objProps['Cycle'] = $cycle
+            $objProps['ReleaseDate'] = $releaseDate
             $objProps['EOL'] = $eolDate
             $objProps['DaysRemaining'] = $days
             $objProps['Status'] = $statusStr
