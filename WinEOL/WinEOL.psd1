@@ -4,7 +4,9 @@
     RootModule        = 'WinEOL.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '1.2.1'
+    ModuleVersion     = '1.2.2'
+
+
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -101,7 +103,7 @@
             # IconUri = ''
 
             # ReleaseNotes of this module
-            ReleaseNotes = 'Fix Output display and Date formatting. Thanks to BlackV for the fix ideas.'
+            ReleaseNotes = 'Remove local caching to simplify logic. Thanks to vim_vs_emacs for the suggestion.'
 
             # Prerelease string of this module
             # Prerelease = ''

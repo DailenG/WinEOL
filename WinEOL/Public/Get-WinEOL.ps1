@@ -5,7 +5,7 @@ function Get-WinEOL {
 
     .DESCRIPTION
         The Get-WinEOL cmdlet fetches product lifecycle data from the endoflife.date API.
-        It supports wildcard searching, session-level caching to reduce API load, and rich object output 
+        It supports wildcard searching and rich object output 
         including calculated status (Active, NearEOL, EOL) and days remaining.
 
         It also includes smart fallback logic for complex products like 'windows-11' that are part of the 'windows' product availability.
@@ -21,9 +21,6 @@ function Get-WinEOL {
 
     .PARAMETER Latest
         Switch to return only the latest release.
-
-    .PARAMETER Refresh
-        Switch to bypass the session cache and force a fresh API call.
 
     .PARAMETER Pro
         Filter for 'Pro' edition (implies *-W suffix).
@@ -85,9 +82,6 @@ function Get-WinEOL {
         [switch]$Latest,
 
         [Parameter()]
-        [switch]$Refresh,
-
-        [Parameter()]
         [string]$Version,
 
         # Edition Filters (Implied naming convention handling)
@@ -110,13 +104,6 @@ function Get-WinEOL {
         [ValidateSet('All', 'Active', 'EOL', 'NearEOL')]
         [string]$Status = 'All'
     )
-
-    begin {
-        # Initialize Cache
-        if (-not (Get-Command Get-WinEOLCache -ErrorAction SilentlyContinue)) {
-            try { . $PSScriptRoot\..\Private\WinEOL.Cache.ps1 } catch {}
-        }
-    }
 
     process {
         # Input Validation (Security & Ruggedness)
@@ -185,21 +172,16 @@ function Get-WinEOL {
         if ($ProductName -match '\*') {
             Write-Verbose "Wildcard detected in '$ProductName'. Fetching all products to search."
             
-            $cacheKey = "ALL_PRODUCTS"
             $allProducts = $null
-            if (-not $Refresh) { $allProducts = (Get-WinEOLCache)[$cacheKey] }
             
-            if ($null -eq $allProducts) {
-                try {
-                    $response = (Invoke-RestMethod "https://endoflife.date/api/v1/products" -ErrorAction Stop)
-                    # Extract product names from v1 API response
-                    $allProducts = $response.result | Select-Object -ExpandProperty name
-                    Set-WinEOLCache -Key $cacheKey -Value $allProducts
-                }
-                catch {
-                    Write-Error "Failed to fetch product list: $_"
-                    return
-                }
+            try {
+                $response = (Invoke-RestMethod "https://endoflife.date/api/v1/products" -ErrorAction Stop)
+                # Extract product names from v1 API response
+                $allProducts = $response.result | Select-Object -ExpandProperty name
+            }
+            catch {
+                Write-Error "Failed to fetch product list: $_"
+                return
             }
 
             $foundProducts = $allProducts | Where-Object { $_ -like $ProductName }
@@ -221,7 +203,7 @@ function Get-WinEOL {
             }
 
             foreach ($m in $foundProducts) {
-                Get-WinEOL -ProductName $m -Refresh:$Refresh -Status $Status -Latest:$Latest -Version $Version -Pro:$Pro -HomeEdition:$HomeEdition -Enterprise:$Enterprise -Education:$Education -IoT:$IoT -Workstation:$Workstation
+                Get-WinEOL -ProductName $m -Status $Status -Latest:$Latest -Version $Version -Pro:$Pro -HomeEdition:$HomeEdition -Enterprise:$Enterprise -Education:$Education -IoT:$IoT -Workstation:$Workstation
             }
             return
         }
@@ -231,78 +213,67 @@ function Get-WinEOL {
         if ($Release) { $url += "/releases/$Release" }
         elseif ($Latest) { $url += "/releases/latest" }
 
-        $cacheKey = "PRODUCT_$ProductName"
-        if ($Release) { $cacheKey += "_$Release" }
-        if ($Latest) { $cacheKey += "_LATEST" }
-
-        $data = $null
-        if (-not $Refresh) { $data = (Get-WinEOLCache)[$cacheKey] }
-        
         $fallbackMode = $false
         $fallbackFilter = $null
         $results = @()
+        $data = $null
 
-        if ($null -eq $data) {
-            try {
-                $response = Invoke-RestMethod -Uri $url -Method Get -ErrorAction Stop
-                $data = $response
-                # Normalize API response (Handle 'result.releases' wrapper vs direct array)
-                if ($data.result -and $data.result.releases) {
-                    $data = $data.result.releases
-                }
-
-                if ($Latest) { $data = @($data) } 
-                Set-WinEOLCache -Key $cacheKey -Value $data
+        try {
+            $response = Invoke-RestMethod -Uri $url -Method Get -ErrorAction Stop
+            $data = $response
+            # Normalize API response (Handle 'result.releases' wrapper vs direct array)
+            if ($data.result -and $data.result.releases) {
+                $data = $data.result.releases
             }
-            catch {
-                $err = $_
-                if ($err.Exception.Response.StatusCode -eq 404) {
-                    # Smart Fallback Logic
-                    if ($ProductName -match '^windows-(\d+(\.\d+)?)$') {
-                        Write-Verbose "Detected Windows version '$($matches[1])'. Redirecting to 'windows' product."
-                        $fallbackProduct = 'windows'
-                        $fallbackFilter = $matches[1] + "*"
-                        $fallbackMode = $true
-                    }
-                    elseif ($ProductName -match '^windows-server-(.*)$') {
-                        Write-Verbose "Detected Windows Server version '$($matches[1])'. Redirecting to 'windows-server' product."
-                        $fallbackProduct = 'windows-server'
-                        $fallbackFilter = "*" + $matches[1] + "*" 
-                        # Note: Server versions are like "2019", "2012-r2". Regex capture needs match.
-                        # windows-server-2019 -> match 1 = 2019. Filter *2019*.
-                        $fallbackMode = $true
-                    }
-                     
-                    if ($fallbackMode) {
-                        # Recursive call with the base product, then we filter results
-                        # BUT we can't easily recurse and filter inside. 
-                        # We will fetch the base product data manually here.
-                        try {
-                            $url = "https://endoflife.date/api/v1/products/$fallbackProduct"
-                            $data = Invoke-RestMethod -Uri $url -ErrorAction Stop
-                            
-                            # Normalize Fallback Data
-                            if ($data.result -and $data.result.releases) {
-                                $data = $data.result.releases
-                            }
 
-                            Set-WinEOLCache -Key "PRODUCT_$fallbackProduct" -Value $data
-                        }
-                        catch {
-                            Write-Error "Failed to fetch fallback product '$fallbackProduct': $_"
-                            return
+            if ($Latest) { $data = @($data) } 
+        }
+        catch {
+            $err = $_
+            if ($err.Exception.Response.StatusCode -eq 404) {
+                # Smart Fallback Logic
+                if ($ProductName -match '^windows-(\d+(\.\d+)?)$') {
+                    Write-Verbose "Detected Windows version '$($matches[1])'. Redirecting to 'windows' product."
+                    $fallbackProduct = 'windows'
+                    $fallbackFilter = $matches[1] + "*"
+                    $fallbackMode = true
+                }
+                elseif ($ProductName -match '^windows-server-(.*)$') {
+                    Write-Verbose "Detected Windows Server version '$($matches[1])'. Redirecting to 'windows-server' product."
+                    $fallbackProduct = 'windows-server'
+                    $fallbackFilter = "*" + $matches[1] + "*" 
+                    # Note: Server versions are like "2019", "2012-r2". Regex capture needs match.
+                    # windows-server-2019 -> match 1 = 2019. Filter *2019*.
+                    $fallbackMode = true
+                }
+                    
+                if ($fallbackMode) {
+                    # Recursive call with the base product, then we filter results
+                    # BUT we can't easily recurse and filter inside. 
+                    # We will fetch the base product data manually here.
+                    try {
+                        $url = "https://endoflife.date/api/v1/products/$fallbackProduct"
+                        $data = Invoke-RestMethod -Uri $url -ErrorAction Stop
+                        
+                        # Normalize Fallback Data
+                        if ($data.result -and $data.result.releases) {
+                            $data = $data.result.releases
                         }
                     }
-                    else {
-                        Write-Warning "Product '$ProductName' not found."
-                        # Fuzzy (simplified)
+                    catch {
+                        Write-Error "Failed to fetch fallback product '$fallbackProduct': $_"
                         return
                     }
                 }
                 else {
-                    Write-Error "API Error: $($err.Message)"
+                    Write-Warning "Product '$ProductName' not found."
+                    # Fuzzy (simplified)
                     return
                 }
+            }
+            else {
+                Write-Error "API Error: $($err.Message)"
+                return
             }
         }
 
