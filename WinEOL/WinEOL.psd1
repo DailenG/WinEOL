@@ -4,10 +4,7 @@
     RootModule        = 'WinEOL.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '1.2.3'
-
-    # Supported PSEditions
-    # CompatiblePSEditions = @()
+    ModuleVersion     = '1.2.4'
 
     # ID used to uniquely identify this module
     GUID              = '7cee3b74-9bdd-4f82-afcd-763e3d95d08f'
@@ -101,7 +98,7 @@
             # IconUri = ''
 
             # ReleaseNotes of this module
-            ReleaseNotes = 'Fix boolean typo in fallback logic.'
+            ReleaseNotes = 'Added community credits to README.'
 
             # Prerelease string of this module
             # Prerelease = ''
