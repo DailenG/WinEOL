@@ -25,6 +25,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $moduleName = "WinEOL"
 $modulePath = Join-Path $PSScriptRoot $moduleName
+$manifestPath = Join-Path $modulePath "$moduleName.psd1"
 $rootReadme = Join-Path $PSScriptRoot "README.md"
 $moduleReadme = Join-Path $modulePath "README.md"
 
