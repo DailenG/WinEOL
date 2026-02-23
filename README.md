@@ -11,6 +11,12 @@ A Windows-focused PowerShell module that uses the [endoflife.date](https://endof
 - **Rich Output**: Returns objects with `Status` (Active, NearEOL, EOL), `DaysRemaining`, and `IsSupported` properties.
 - **Wildcard Support**: Easily find products like `windows-*` or `windows-server-2019`.
 
+## Documentation
+
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/DailenG/WinEOL)
+
+View the interactive documentation on [DeepWiki](https://deepwiki.com/DailenG/WinEOL)
+
 ## Installation
 
 ```powershell
