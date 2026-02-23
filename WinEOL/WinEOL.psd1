@@ -19,7 +19,7 @@
     Copyright         = '2026'
 
     # Description of the functionality provided by this module
-    Description       = 'A Windows-focused PowerShell module which uses the endoflife.date api to report on product support dates and versions.'
+    Description       = 'A Windows-focused PowerShell module which uses the endoflife.date api to report on product support dates and versions. Interactive documentation: https://deepwiki.com/DailenG/WinEOL'
 
     # Minimum version of the PowerShell engine required by this module
     PowerShellVersion = '7.0'
@@ -98,7 +98,7 @@
             # IconUri = ''
 
             # ReleaseNotes of this module
-            ReleaseNotes = 'Added community credits to README.'
+            ReleaseNotes = 'Interactive documentation available at: https://deepwiki.com/DailenG/WinEOL'
 
             # Prerelease string of this module
             # Prerelease = ''
