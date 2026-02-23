@@ -4,7 +4,7 @@
     RootModule        = 'WinEOL.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '1.2.4'
+    ModuleVersion     = '1.2.5'
 
     # ID used to uniquely identify this module
     GUID              = '7cee3b74-9bdd-4f82-afcd-763e3d95d08f'
@@ -98,7 +98,7 @@
             # IconUri = ''
 
             # ReleaseNotes of this module
-            ReleaseNotes = 'Interactive documentation available at: https://deepwiki.com/DailenG/WinEOL'
+            ReleaseNotes = 'v1.2.5 - Added DeepWiki interactive documentation links.'
 
             # Prerelease string of this module
             # Prerelease = ''
