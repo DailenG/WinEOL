@@ -13,6 +13,9 @@ function Get-WinServerEOL {
     .EXAMPLE
         Get-WinServerEOL -Status NearEOL
         Returns Windows Server versions approaching End of Life.
+
+    .RELATEDLINKS
+        https://deepwiki.com/DailenG/WinEOL
     #>
     [CmdletBinding()]
     param(

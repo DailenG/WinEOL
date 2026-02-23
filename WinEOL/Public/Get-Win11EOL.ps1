@@ -35,6 +35,9 @@ function Get-Win11EOL {
     .EXAMPLE
         Get-Win11EOL -Version 25H2
         Returns all Windows 11 25H2 versions (Pro and Enterprise).
+
+    .RELATEDLINKS
+        https://deepwiki.com/DailenG/WinEOL
     #>
     [CmdletBinding()]
     param(

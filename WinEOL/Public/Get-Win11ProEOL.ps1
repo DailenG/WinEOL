@@ -24,6 +24,9 @@ function Get-Win11ProEOL {
     .EXAMPLE
         Get-Win11ProEOL -Version 25H2
         Returns Windows 11 Pro 25H2.
+
+    .RELATEDLINKS
+        https://deepwiki.com/DailenG/WinEOL
     #>
     [CmdletBinding()]
     param(

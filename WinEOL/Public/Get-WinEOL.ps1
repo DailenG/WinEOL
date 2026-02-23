@@ -65,6 +65,9 @@ function Get-WinEOL {
     .EXAMPLE
         Get-WinEOL -ListAvailable
         Lists all Windows products support by the API (windows-*).
+
+    .RELATEDLINKS
+        https://deepwiki.com/DailenG/WinEOL
     #>
     [CmdletBinding(DefaultParameterSetName = 'Default')]
     param(
