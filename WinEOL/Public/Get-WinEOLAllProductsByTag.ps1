@@ -45,7 +45,7 @@ function Get-WinEOLAllProductsByTag {
     $url = "https://endoflife.date/api/v1/tags/$($Tag)"
 
     try {
-        $products = Invoke-RestMethod -Uri $url -ErrorAction Stop
+        $products = Invoke-RestMethod -Uri $url -UseBasicParsing -ErrorAction Stop
 
         if ($null -eq $products) {
             Write-Error "No products found for the tag '$Tag'."

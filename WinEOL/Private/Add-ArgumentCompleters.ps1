@@ -8,7 +8,7 @@ function Add-ArgumentCompleters {
 
         $url = "https://endoflife.date/api/v1/products"
 
-        $products = Invoke-RestMethod -Uri $url
+        $products = Invoke-RestMethod -Uri $url -UseBasicParsing
         $productNames = $products.result.name | Sort-Object
 
         $productNames | Where-Object { $_ -like "$wordToComplete*" } | ForEach-Object {
@@ -23,7 +23,7 @@ function Add-ArgumentCompleters {
 
         $url = "https://endoflife.date/api/v1/categories"
 
-        $categories = Invoke-RestMethod -Uri $url
+        $categories = Invoke-RestMethod -Uri $url -UseBasicParsing
         $categoryNames = $categories.result.name | Sort-Object
 
         $categoryNames | Where-Object { $_ -like "$wordToComplete*" } | ForEach-Object {
@@ -38,7 +38,7 @@ function Add-ArgumentCompleters {
 
         $url = "https://endoflife.date/api/v1/tags"
 
-        $tags = Invoke-RestMethod -Uri $url
+        $tags = Invoke-RestMethod -Uri $url -UseBasicParsing
         $tagNames = $tags.result.name | Sort-Object
 
         $tagNames | Where-Object { $_ -like "$wordToComplete*" } | ForEach-Object {
@@ -55,7 +55,7 @@ function Add-ArgumentCompleters {
             $productName = $fakeBoundParameters['ProductName']
             $url = "https://endoflife.date/api/v1/products/$($productName)"
 
-            $product = Invoke-RestMethod -Uri $url
+            $product = Invoke-RestMethod -Uri $url -UseBasicParsing
             $releaseNames = $product.result.releases.name
 
             $releaseNames | Where-Object { $_ -like "$wordToComplete*" } | ForEach-Object {

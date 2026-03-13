@@ -45,7 +45,7 @@ function Get-WinEOLAllProductsByCategory {
     $url = "https://endoflife.date/api/v1/categories/$($Category)"
 
     try {
-        $products = Invoke-RestMethod -Uri $url -ErrorAction Stop
+        $products = Invoke-RestMethod -Uri $url -UseBasicParsing -ErrorAction Stop
 
         if ($null -eq $products) {
             Write-Error "No products found in the name '$Category'."

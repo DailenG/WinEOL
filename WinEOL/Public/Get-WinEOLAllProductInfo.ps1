@@ -17,15 +17,15 @@ function Get-WinEOLAllProducts {
     $url = "https://endoflife.date/api/v1/products/full"
 
     try {
-        $allProducts = Invoke-WebRequest -Uri $url -Method Get -ErrorAction Stop
+        $allProducts = Invoke-RestMethod -Uri $url -Method Get -UseBasicParsing -ErrorAction Stop
 
         if ($null -eq $allProducts) {
             Write-Error "No products found."
             return
         }
 
-        # Convert the JSON response to a PowerShell object
-        $allProducts = ($allProducts.Content | ConvertFrom-Json).result
+        # The JSON response is automatically converted to a PowerShell object by Invoke-RestMethod
+        $allProducts = $allProducts.result
 
         # Add pstypenames for each product, this will be used for custom formatting and validation
         foreach ($p in $allProducts) {

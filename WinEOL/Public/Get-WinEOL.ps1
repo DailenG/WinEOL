@@ -178,7 +178,7 @@ function Get-WinEOL {
             $allProducts = $null
             
             try {
-                $response = (Invoke-RestMethod "https://endoflife.date/api/v1/products" -ErrorAction Stop)
+                $response = (Invoke-RestMethod "https://endoflife.date/api/v1/products" -UseBasicParsing -ErrorAction Stop)
                 # Extract product names from v1 API response
                 $allProducts = $response.result | Select-Object -ExpandProperty name
             }
@@ -222,7 +222,7 @@ function Get-WinEOL {
         $data = $null
 
         try {
-            $response = Invoke-RestMethod -Uri $url -Method Get -ErrorAction Stop
+            $response = Invoke-RestMethod -Uri $url -Method Get -UseBasicParsing -ErrorAction Stop
             $data = $response
             # Normalize API response (Handle 'result.releases' wrapper vs direct array)
             if ($data.result -and $data.result.releases) {
@@ -256,7 +256,7 @@ function Get-WinEOL {
                     # We will fetch the base product data manually here.
                     try {
                         $url = "https://endoflife.date/api/v1/products/$fallbackProduct"
-                        $data = Invoke-RestMethod -Uri $url -ErrorAction Stop
+                        $data = Invoke-RestMethod -Uri $url -UseBasicParsing -ErrorAction Stop
                         
                         # Normalize Fallback Data
                         if ($data.result -and $data.result.releases) {
