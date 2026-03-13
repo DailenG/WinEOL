@@ -4,7 +4,7 @@
     RootModule        = 'WinEOL.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '1.2.5'
+    ModuleVersion     = '1.3.0'
 
     # ID used to uniquely identify this module
     GUID              = '7cee3b74-9bdd-4f82-afcd-763e3d95d08f'
@@ -19,10 +19,13 @@
     Copyright         = '2026'
 
     # Description of the functionality provided by this module
-    Description       = 'A Windows-focused PowerShell module which uses the endoflife.date api to report on product support dates and versions. Interactive documentation: https://deepwiki.com/DailenG/WinEOL'
+    Description       = 'A Windows-focused PowerShell module compatible with PowerShell 5.1 and 7+ which uses the endoflife.date API to report on Windows product support dates, lifecycle status, and release information. Interactive documentation: https://deepwiki.com/DailenG/WinEOL'
 
     # Minimum version of the PowerShell engine required by this module
-    PowerShellVersion = '7.0'
+    PowerShellVersion = '5.1'
+
+    # Indicates the core editions of the PowerShell engine that the module expects. Valid values are Desktop and Core.
+    CompatiblePSEditions = @('Desktop', 'Core')
 
     # Name of the PowerShell host required by this module
     # PowerShellHostName = ''
@@ -86,7 +89,7 @@
         PSData = @{
 
             # Tags applied to this module. These help with module discovery in online galleries.
-            # Tags = @('endoflife','Windows','EOL','lifecycle','support','Dailen')
+            Tags = @('endoflife','Windows','EOL','lifecycle','support','PowerShell5','BackwardCompatibility')
 
             # A URL to the license for this module.
             LicenseUri   = 'https://opensource.org/licenses/MIT'
@@ -98,7 +101,7 @@
             # IconUri = ''
 
             # ReleaseNotes of this module
-            ReleaseNotes = 'v1.2.5 - Added DeepWiki interactive documentation links.'
+            ReleaseNotes = 'v1.3.0 - Added Windows PowerShell 5.1 support: updated PowerShellVersion requirement, enforced TLS 1.2, modernized API calls with Invoke-RestMethod and -UseBasicParsing, and refactored Pester tests for cross-edition compatibility.'
 
             # Prerelease string of this module
             # Prerelease = ''
